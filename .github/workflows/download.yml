@@ -1,0 +1,30 @@
+name: Download YouTube Video
+on:
+  workflow_dispatch:
+    inputs:
+      video_url:
+        description: 'Paste the YouTube Video URL here'
+        required: true
+        type: string
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install yt-dlp
+        run: |
+          sudo wget https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -O /usr/local/bin/yt-dlp
+          sudo chmod a+rx /usr/local/bin/yt-dlp
+
+      - name: Download Video as MP4
+        run: |
+          yt-dlp -f "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]" "${{ github.event.inputs.video_url }}" -o "video.mp4"
+
+      - name: Upload Video to GitHub Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-video
+          path: video.mp4
