@@ -14,14 +14,19 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Install yt-dlp
+      - name: Setup Node.js (Fixes JS Runtime Warning)
+        uses: actions/setup-node@v4
+        with:
+          node-on-version: '20'
+
+      - name: Install Latest yt-dlp
         run: |
           sudo wget https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -O /usr/local/bin/yt-dlp
           sudo chmod a+rx /usr/local/bin/yt-dlp
 
-      - name: Download Video as MP4
+      - name: Download Video using iOS Client (Bypasses Bot Block)
         run: |
-          yt-dlp -f "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]" "${{ github.event.inputs.video_url }}" -o "video.mp4"
+          yt-dlp --extractor-args "youtube:player_client=ios" -f "bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]" "${{ github.event.inputs.video_url }}" -o "video.mp4"
 
       - name: Upload Video to GitHub Artifacts
         uses: actions/upload-artifact@v4
